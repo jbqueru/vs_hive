@@ -91,8 +91,12 @@ each target, e.g. files that declaring that `GRP0` is `$1B`, or that
 When the program is meant to be used in a public terminal, such as a
 gaming cabinet installed in an amusement arcade, whether coin-operated
 or not, the resulting terminal should be considered a **User Product**.
+
 Additionally, using such a terminal will be considered a
-**Remote Network Interaction**.
+**Remote Network Interaction**. While I realize that this is quite
+a stretch from the letter of AGPLv3, it's also consistent with the
+spirit of GPL in general where users of software must be allowed to
+maintain it and modify it.
 
 # In practice
 
