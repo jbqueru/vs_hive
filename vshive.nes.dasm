@@ -29,6 +29,48 @@
 ; #############################################################################
 ; #############################################################################
 
+	processor	6502
+
+; #############################################################################
+; #############################################################################
+; ###                                                                       ###
+; ###                                                                       ###
+; ###                       NES Hardware Definitions                        ###
+; ###                                                                       ###
+; ###                                                                       ###
+; #############################################################################
+; #############################################################################
+
+; ###############################
+; ##                           ##
+; ##  Audio-related registers  ##
+; ##                           ##
+; ###############################
+
+_APUSQ1CTRL	equ	$4000
+_APUSQ1SWEEP	equ	$4001
+_APUSQ1LO	equ	$4002
+_APUSQ1HI	equ	$4003
+_APUSQ2CTRL	equ	$4004
+_APUSQ2SWEEP	equ	$4005
+_APUSQ2LO	equ	$4006
+_APUSQ2HI	equ	$4007
+_APUTRICTRL	equ	$4008
+_APUTRILO	equ	$400A
+_APUTRIHI	equ	$400B
+_APUNSECTRL	equ	$400C
+_APUNSELO	equ	$400E
+_APUNSEHI	equ	$400F
+_APUDMCCTRL	equ	$4010
+_APUDMCRAW	equ	$4011
+_APUDMCADDR	equ	$4012
+_APUDMCLEN	equ	$4013
+;			$4014 is in the sprite section
+_APUSTATUS	equ	$4015
+;			$4016 is in the joypad section
+_APUSEQ		equ	$4017
+
+
 ; Source format: hard tabs, 8 characters wide
 ; Source width: 120 columns. Block comments should fit either in the first
 ; 80 columns or in the last 80 columns.
