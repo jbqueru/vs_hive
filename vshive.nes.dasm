@@ -139,3 +139,36 @@ _OAMDMA		equ	$4014
 
 _JOYPAD1	equ	$4016
 _JOYPAD2	equ	$4017
+
+; #############################################################################
+; #############################################################################
+; ###                                                                       ###
+; ###                                                                       ###
+; ###                              iNES Header                              ###
+; ###                                                                       ###
+; ###                                                                       ###
+; #############################################################################
+; #############################################################################
+
+	seg	header
+	org	$7FF0
+
+	dc.b	"NES",$1A	; iNES file format identifier, 1A = EOF
+	dc.b	2		; 2 * 16kB PRG ROM
+	dc.b	1		; 1 * 8kB CHR ROM
+	dc.b	%00000001	; iNES flags 6
+		;||||||||
+		;|||||||+-------- VRAM arrangement, 0 = vertical or mapper
+		;|||||||		  1 = horizontal
+		;||||||+--------- Persistent 8kB PRG RAM at $6000
+		;|||||+---------- Trainer (typically unused)
+		;||||+----------- 4kB VRAM
+		;++++------------ Low 4 bits of mapper number. 0 = NROM
+	dc.b 	%00000000	; iNES flags 7
+		;||||||||
+		;|||||||+-------- VS Unisystem
+		;||||||+--------- PlayChoice-10
+		;||||++---------- 00 = iNES header format
+		;++++------------ Upper 4 bits of mapper number
+	dc.b	0,0,0,0,0,0,0,0	; iNes flags 8-15, reserved, use NES 2.0 format
+        			; 	for extended features
