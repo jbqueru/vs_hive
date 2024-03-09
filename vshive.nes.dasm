@@ -70,6 +70,67 @@ _APUSTATUS	equ	$4015
 ;			$4016 is in the joypad section
 _APUSEQ		equ	$4017
 
+; ##################################
+; ##                              ##
+; ##  Graphics-related registers  ##
+; ##                              ##
+; ##################################
+
+_PPUCTRL	equ	$2000	; ixdtsvaa
+				; ||||||||
+				; ||||||++- background table address in PPU address space
+				; ||||||        (with caveat that only 2 of those are populated on the NES itself,
+				; ||||||        such that in most situations or of those are real and 2 are mirrored,
+				; ||||||        with the actual arrangement handled by the cartridge)
+				; ||||||     00 = $2000
+				; ||||||     01 = $2400
+				; ||||||     10 = $2800
+				; ||||||     11 = $2C00
+				; |||||+--- increment direction when accessing
+				; |||||     _PPUDATA
+				; |||||      0 = horizontal (1 byte increment)
+				; |||||      1 = vertical (32 byte increment)
+				; ||||+---- sprite bitmap address in PPU address space
+				; ||||       0 = $0000
+				; ||||       1 = $1000
+				; ||||       (ignored with 8x16 sprites)
+				; |||+----- background bitmap address in PPU address space
+				; |||        0 = $0000
+				; |||        1 = $1000
+				; ||+------ double-height sprites
+				; ||         0 = 8x8 sprites
+				; ||         1 = 8x16 sprites
+				; |+------- communication with external PPU
+				; |          0 = get backrgound from external
+				; |          1 = send background to external
+				; |          NEVER SET TO 1 ON A REAL NES
+				; +-------- interrupt enable
+				;            0 = NMI disabled
+				;            1 = NMI enabled
+_PPUMASK	equ	$2001
+_PPUSTATUS	equ	$2002
+_PPUSCROLL	equ	$2005
+_PPUADDR	equ	$2006
+_PPUDATA	equ	$2007
+
+; ################################
+; ##                            ##
+; ##  Sprite-related registers  ##
+; ##                            ##
+; ################################
+
+_OAMADDR	equ	$2003
+_OAMDATA	equ	$2004
+_OAMDMA		equ	$4014
+
+; ################################
+; ##                            ##
+; ##  Joypad-related registers  ##
+; ##                            ##
+; ################################
+
+_JOYPAD1	equ	$4016
+_JOYPAD2	equ	$4017
 
 ; Source format: hard tabs, 8 characters wide
 ; Source width: 120 columns. Block comments should fit either in the first
