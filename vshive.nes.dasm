@@ -15,13 +15,13 @@
 ;
 ; SPDX-License-Identifier: AGPL-3.0-or-later
 
-; Source format: hard tabs, 8 characters wide
-; Source width: 120 columns. Block comments should fit either in the first
-; 80 columns or in the last 80 columns.
-; The following lines show the various widths involved.
-; 3456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890
-; 345678901234567890123456789012345678901234567890123456789012345678901234567890
-;                                       12345678901234567890123456789012345678901234567890123456789012345678901234567890
+; Source format:
+;	- ASCII
+;	- hard tabs, 8 characters wide, except in ASCII art
+;	- 120 columns overall
+;	- Standalone block comments in the first 80 columns
+;	- Code-related block comments allowed in the last 80 columns
+;	- Rulers at 40, 80 and 120 columns help source width
 
 ; #############################################################################
 ; #############################################################################
@@ -561,3 +561,9 @@ IRQHandler:
 	org	$11FFF
 
 	dc.b	0
+
+; Source width guidelines
+; 3456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890
+; 345678901234567890123456789012345678901234567890123456789012345678901234567890
+;                                       12345678901234567890123456789012345678901234567890123456789012345678901234567890
+
