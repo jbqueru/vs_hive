@@ -84,37 +84,38 @@ _APUSEQ		equ	$4017
 ; ##                              ##
 ; ##################################
 
-_PPUCTRL	equ	$2000	; ixdtsvaa
-				; ||||||||
-				; ||||||++- background table address in PPU address space
-				; ||||||        (with caveat that only 2 of those are populated on the NES itself,
-				; ||||||        such that in most situations or of those are real and 2 are mirrored,
-				; ||||||        with the actual arrangement handled by the cartridge)
-				; ||||||     00 = $2000
-				; ||||||     01 = $2400
-				; ||||||     10 = $2800
-				; ||||||     11 = $2C00
-				; |||||+--- increment direction when accessing
-				; |||||     _PPUDATA
-				; |||||      0 = horizontal (1 byte increment)
-				; |||||      1 = vertical (32 byte increment)
-				; ||||+---- sprite bitmap address in PPU address space
-				; ||||       0 = $0000
-				; ||||       1 = $1000
-				; ||||       (ignored with 8x16 sprites)
-				; |||+----- background bitmap address in PPU address space
-				; |||        0 = $0000
-				; |||        1 = $1000
-				; ||+------ double-height sprites
-				; ||         0 = 8x8 sprites
-				; ||         1 = 8x16 sprites
-				; |+------- communication with external PPU
-				; |          0 = get backrgound from external
-				; |          1 = send background to external
-				; |          NEVER SET TO 1 ON A REAL NES
-				; +-------- interrupt enable
-				;            0 = NMI disabled
-				;            1 = NMI enabled
+_PPUCTRL	equ	$2000		; ixdtsvaa
+					; ||||||||
+					; ||||||++- background table address in PPU address space
+					; ||||||        (with caveat that only 2 of those are populated on the NES
+					; ||||||        itself, such that in most situations 2 of those are real and
+					; ||||||        2 are mirrored, with the actual arrangement handled by the
+					; ||||||        cartridge, including some exotic arrangements)
+					; ||||||     00 = $2000
+					; ||||||     01 = $2400
+					; ||||||     10 = $2800
+					; ||||||     11 = $2C00
+					; |||||+--- increment direction when accessing
+					; |||||     _PPUDATA
+					; |||||      0 = horizontal (1 byte increment)
+					; |||||      1 = vertical (32 byte increment)
+					; ||||+---- sprite bitmap address in PPU address space
+					; ||||       0 = $0000
+					; ||||       1 = $1000
+					; ||||       (ignored with 8x16 sprites)
+					; |||+----- background bitmap address in PPU address space
+					; |||        0 = $0000
+					; |||        1 = $1000
+					; ||+------ double-height sprites
+					; ||         0 = 8x8 sprites
+					; ||         1 = 8x16 sprites
+					; |+------- communication with external PPU
+					; |          0 = get backrgound from external
+					; |          1 = send background to external
+					; |          NEVER SET TO 1 ON A REAL NES
+					; +-------- interrupt enable
+					;            0 = NMI disabled
+					;            1 = NMI enabled
 _PPUMASK	equ	$2001
 _PPUSTATUS	equ	$2002
 _PPUSCROLL	equ	$2005
