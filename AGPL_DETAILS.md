@@ -47,10 +47,11 @@ It is understood that not all retrocomputing targets can reasonably
 display **Appropriate Legal Notices** as defined in GPL.
 
 As a rough guideline, targets with less than 32kB of total RAM will
-rarely be expected to display such notices, while machines with 32kB
-or more of total RAM will typically have the necessary capabilities,
-though the exact criteria will depend on the exact characteristics of
-both the target and the actual program.
+rarely be expected to display such notices, while machines with 1MB
+or more of total RAM will typically have no difficulty displaying
+such notices.
+Between those extremes, the choice will depend on the exact
+characteristics of both the target and the actual program.
 
 ## Source Code and Preferred Form
 
