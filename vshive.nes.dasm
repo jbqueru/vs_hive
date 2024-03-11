@@ -209,6 +209,70 @@ Reset:
 	CLD			; disable BCD mode, not present in NES 2A03 CPU
 	SEI			; inhibit maskable interrupts
 
+; *****************
+; **             **
+; ** Disable APU **
+; **             **
+; *****************
+
+	LDA	#$40
+	STA	_APUSEQ		; inhibit APU sequencer interrupts
+
+	LDA	#0
+	STA	_APUDMCCTRL	; disable DMC interrupts
+	LDX	_APUSTATUS	; clear DMC pending interrupt (as a side effect of reading that register)
+	STA	_APUSTATUS	; disable audio
+
+; **************************
+; **                      **
+; ** Wait until first VBL **
+; **                      **
+; **************************
+
+PollVBLInit1:
+	BIT	_PPUSTATUS
+	NOP			; pad loop so that it's neither a multiple of 8 clocks nor of 11 clocks
+				; that's because the dendy frame takes a whole number of cycles that's
+				; a multiple of both 8 and 11, and there's a known race condition where
+				; the bit could be read as zero *and* cleared by a poorly times read.
+	BPL	PollVBLInit1
+
+; ***************
+; **           **
+; ** Clear RAM **
+; **           **
+; ***************
+
+; TODO: investigate whether there's a shorter way
+	LDA	#0
+	TAX
+InitRAM:
+	STA	$0,X
+	STA	$100,X
+	STA	$200,X
+	STA	$300,X
+	STA	$400,X
+	STA	$500,X
+	STA	$600,X
+	STA	$700,X
+	INX
+	BNE	InitRAM
+
+; ***************************
+; **                       **
+; ** Wait until second VBL **
+; **                       **
+; ***************************
+
+PollVBLInit2:
+	BIT	_PPUSTATUS
+	NOP			; pad loop so that it's neither a multiple of 8 clocks nor of 11 clocks
+				; that's because the dendy frame takes a whole number of cycles that's
+				; a multiple of both 8 and 11, and there's a known race condition where
+				; the bit could be read as zero *and* cleared by a poorly times read.
+	BPL	PollVBLInit2
+; From this point PPU is ready to use
+
 Loop:
 	JMP	Loop
 
