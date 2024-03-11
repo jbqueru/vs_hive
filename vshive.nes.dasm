@@ -144,6 +144,35 @@ _JOYPAD2	equ	$4017
 ; #############################################################################
 ; ###                                                                       ###
 ; ###                                                                       ###
+; ###                              RAM Layout                               ###
+; ###                                                                       ###
+; ###                                                                       ###
+; #############################################################################
+; #############################################################################
+
+	seg.u	zeropage
+	org	$0000
+
+	seg.u	stack
+	org	$0100
+
+	seg.u	oam
+	org	$0200
+oam_shadow	ds.b	256
+
+		; for each of 64 sprites:
+		; Y position
+		; tile index number
+		; attributes
+		; X position
+
+	seg.u	variables
+	org	$0300
+
+; #############################################################################
+; #############################################################################
+; ###                                                                       ###
+; ###                                                                       ###
 ; ###                              iNES Header                              ###
 ; ###                                                                       ###
 ; ###                                                                       ###
@@ -272,6 +301,71 @@ PollVBLInit2:
 				; the bit could be read as zero *and* cleared by a poorly times read.
 	BPL	PollVBLInit2
 ; From this point PPU is ready to use
+
+; #######################
+; #######################
+; ###                 ###
+; ###  Graphics init  ###
+; ###                 ###
+; #######################
+; #######################
+
+; *** init PPU ***
+	LDA	#0
+	STA	_PPUMASK	; disable graphics
+	LDX	_PPUSTATUS	; clear NMI VBL pending interrupt (as side effect of readng that register)
+	LDA	#%10000000	; enable NMI
+        STA	_PPUCTRL
+
+; *** clear VRAM ***
+; unlike plain RAM, the VRAM pointer _PPUADDR auto-increments, so it's easier to clear a large area.
+	LDX	#>$2000
+	LDY	#<$2000
+	STX	_PPUADDR	; set PPU Address to $2000, beginning of VRAM
+	STY	_PPUADDR
+
+	LDY	#0		; 256 outer loops
+	TYA
+InitVRAM1:
+	LDX	#16		; 16 inner loops, 4096 bytes
+InitVRAM2:
+	STA	_PPUDATA
+	DEX
+	BNE	InitVRAM2
+	DEY
+	BNE	InitVRAM1
+
+; *** prepare OAM shadow with sprites out of the way ***
+	CLC
+	LDX	#$40
+InitSprite:
+	LDA	#$FF
+	STA	oam_shadow,Y
+	TYA
+	ADC	#4
+	TAY
+	DEX
+	BNE	InitSprite
+
+; *** clear palette ***
+	LDX	#>$3F00
+	LDY	#<$3F00
+	STX	_PPUADDR
+	STY	_PPUADDR
+
+	LDA	#$1D		; black (!)
+	LDX	#32
+InitPalette:
+	STA	_PPUDATA
+	DEX
+	BNE	InitPalette
+
+; *** reset address and scroll position after accessing PPU data ***
+	LDA	#0
+	STA	_PPUSCROLL
+	STA	_PPUSCROLL
+	LDA	#%10000000
+	STA	_PPUCTRL
 
 Loop:
 	JMP	Loop
