@@ -409,8 +409,8 @@ WaitVBLSetup1:
 	STA	_PPUDATA
 
 ; *** write a few tiles ***
-	LDX	#$21
-	LDY	#$1E
+	LDX	#>$211E
+	LDY	#<$211E
 	STX	_PPUADDR
 	STY	_PPUADDR
 
