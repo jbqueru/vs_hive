@@ -13,3 +13,7 @@ As a special exception, the source assets for the game (images, text, music,
 movie files) as well as output from the game (screenshots, audio or video
 recordings) are also licensed under the
 [CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0/) License.
+That exception explicitly does not apply to source code or
+object/executable code.
+
+When in doubt, AGPL is always applicable.
