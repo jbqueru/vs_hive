@@ -185,7 +185,7 @@ vbl_count	ds.b	1
 ; #############################################################################
 
 	seg	header
-	org	$7FF0
+	org	$0
 
 	dc.b	"NES",$1A	; iNES file format identifier, 1A = EOF
 	dc.b	2		; 2 * 16kB PRG ROM
@@ -218,7 +218,8 @@ vbl_count	ds.b	1
 ; #############################################################################
 
 	seg	prg_rom
-	org	$8000
+	org	$10
+	rorg	$8000
 
 ; ######################
 ; ######################
@@ -507,7 +508,8 @@ IRQHandler:
 ; #############################################################################
 ; #############################################################################
 
-	org	$FFFA
+	org	$800A
+	rorg	$FFFA
 	dc.w	NMIHandler
 	dc.w	Reset
 	dc.w	IRQHandler
@@ -523,7 +525,8 @@ IRQHandler:
 ; #############################################################################
 
 	seg	chr_rom
-	org	$10000		; not real, but gives the correct file layout
+	org	$8010		; not real, but gives the correct file layout
+	rorg	$0
 
 	dc.b	%00000000
 	dc.b	%00000000
@@ -561,8 +564,8 @@ IRQHandler:
 	dc.b	%00000000
 	dc.b	%00000000
 
-	org	$11FFF
-
+	org	$A00F
+	rorg	$1FFF
 	dc.b	0
 
 ; Source width guidelines
