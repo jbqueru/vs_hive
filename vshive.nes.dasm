@@ -407,6 +407,10 @@ WaitVBLSetup1:
 
 	LDA	#$26
 	STA	_PPUDATA
+	LDA	#$16
+	STA	_PPUDATA
+	LDA	#$36
+	STA	_PPUDATA
 
 ; *** write a few tiles ***
 	LDX	#>$211E
@@ -548,20 +552,20 @@ IRQHandler:
 
 	dc.b	%11111111
 	dc.b	%11111111
-	dc.b	%11111111
-	dc.b	%11111111
-	dc.b	%11111111
-	dc.b	%11111111
-	dc.b	%11111111
+	dc.b	%11111101
+	dc.b	%11111101
+	dc.b	%11111101
+	dc.b	%11111101
+	dc.b	%11000001
 	dc.b	%11111111
 
 	dc.b	%00000000
-	dc.b	%00000000
-	dc.b	%00000000
-	dc.b	%00000000
-	dc.b	%00000000
-	dc.b	%00000000
-	dc.b	%00000000
+	dc.b	%01111100
+	dc.b	%01000010
+	dc.b	%01000010
+	dc.b	%01000010
+	dc.b	%01000010
+	dc.b	%00111110
 	dc.b	%00000000
 
 	org	$A00F
