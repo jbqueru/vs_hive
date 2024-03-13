@@ -206,7 +206,7 @@ level_bit	ds.b	1
 		;||||++---------- 00 = iNES header format
 		;++++------------ Upper 4 bits of mapper number
 	dc.b	0,0,0,0,0,0,0,0	; iNes flags 8-15, reserved, use NES 2.0 format
-        			; 	for extended features
+				; 	for extended features
 
 ; #############################################################################
 ; #############################################################################
@@ -322,7 +322,7 @@ PollVBLInit2:
 	STA	_PPUMASK	; disable graphics
 	LDX	_PPUSTATUS	; clear NMI VBL pending interrupt (as side effect of readng that register)
 	LDA	#%10000000	; enable NMI
-        STA	_PPUCTRL
+	STA	_PPUCTRL
 
 ; *** clear VRAM ***
 ; unlike plain RAM, the VRAM pointer _PPUADDR auto-increments, so it's easier to clear a large area.
