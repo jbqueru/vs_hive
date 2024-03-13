@@ -586,7 +586,7 @@ Level0:
 ; #############################################################################
 
 	seg	chr_rom
-	org	$8010		; not real, but gives the correct file layout
+	org	$8010
 	rorg	$0
 
 	dc.b	%00000000
