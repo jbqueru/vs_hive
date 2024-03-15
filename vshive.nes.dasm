@@ -503,12 +503,16 @@ MainLoop:
 	LDA	#0
 	STA	vbl_count
 WaitVBLMain:
-	CMP	vbl_count
-	BEQ	WaitVBLMain
+	CMP	vbl_count		; 4 cycles
+	BEQ	WaitVBLMain		; 2 cycles when not taken
+					; about 2267 cycles available from here
+					;   until rendering starts
 
 ; *** update sprites first ***
-	LDA	#>oam_shadow
-	STA	_OAMDMA
+	LDA	#>oam_shadow		; 2 cycles
+	STA	_OAMDMA			; 4 + 513 or 514 cycles
+
+; *** done messing with OAM and PPU, prepare next frame ***
 
 	LDA	sprite_x
 	STA	oam_shadow + 3
