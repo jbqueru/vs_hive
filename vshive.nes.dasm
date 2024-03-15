@@ -327,7 +327,7 @@ PollVBLInit2:
 	LDA	#0
 	STA	_PPUMASK	; disable graphics
 	LDX	_PPUSTATUS	; clear NMI VBL pending interrupt (as side effect of readng that register)
-	LDA	#%10000000	; enable NMI
+	LDA	#%10010000	; enable NMI
 	STA	_PPUCTRL
 
 ; *** clear VRAM ***
@@ -377,7 +377,7 @@ InitPalette:
 	LDA	#0
 	STA	_PPUSCROLL
 	STA	_PPUSCROLL
-	LDA	#%10000000
+	LDA	#%10010000
 	STA	_PPUCTRL
 
 ; #############################################################################
@@ -445,7 +445,7 @@ SetBG:
 	LDA	#0
 	STA	_PPUSCROLL
 	STA	_PPUSCROLL
-	LDA	#%10000000
+	LDA	#%10010000
 	STA	_PPUCTRL
 
 	LDA	#0
@@ -466,7 +466,7 @@ WaitVBLSetup2:
 	LDA	#0
 	STA	_PPUSCROLL
 	STA	_PPUSCROLL
-	LDA	#%10000000
+	LDA	#%10010000
 	STA	_PPUCTRL
 
 ; #############################################################################
@@ -490,7 +490,7 @@ WaitVBLMain:
 	LDA	#>oam_shadow
 	STA	_OAMDMA
 
-	LDA	#%10000000
+	LDA	#%10010000
 	STA	_PPUCTRL
 
 	JMP	MainLoop
@@ -581,8 +581,28 @@ Level0:
 ; #############################################################################
 
 	seg	chr_rom
+
+; #################
+; #################
+; ###           ###
+; ###  Sprites  ###
+; ###           ###
+; #################
+; #################
+
 	org	$8010
 	rorg	$0
+
+; ###############
+; ###############
+; ###         ###
+; ###  Tiles  ###
+; ###         ###
+; ###############
+; ###############
+
+	org	$9010
+	rorg	$1000
 
 	dc.b	%00000000
 	dc.b	%00000000
