@@ -490,19 +490,8 @@ WaitVBLMain:
 	LDA	#>oam_shadow
 	STA	_OAMDMA
 
-	LDA	$FE
-	ASL
-	STA	_PPUSCROLL
-	LDA	#0
-	STA	_PPUSCROLL
-
 	LDA	#%10000000
-	BCC	DoneCtrl
-	ORA	#%00000001
-DoneCtrl:
 	STA	_PPUCTRL
-
-	INC	$FE
 
 	JMP	MainLoop
 
