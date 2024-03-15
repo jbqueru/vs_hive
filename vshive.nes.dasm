@@ -419,6 +419,18 @@ WaitVBLSetup1:
 	LDA	#$36
 	STA	_PPUDATA
 
+	LDX	#>$3F11
+	LDY	#<$3F11
+	STX	_PPUADDR
+	STY	_PPUADDR
+
+	LDA	#$22
+	STA	_PPUDATA
+	LDA	#$12
+	STA	_PPUDATA
+	LDA	#$32
+	STA	_PPUDATA
+
 ; *** write level tiles ***
 	LDX	#>$2000
 	LDY	#<$2000
@@ -489,6 +501,13 @@ WaitVBLMain:
 ; *** update sprites first ***
 	LDA	#>oam_shadow
 	STA	_OAMDMA
+
+	LDA	#128
+	STA	oam_shadow + 0
+	STA	oam_shadow + 3
+	LDA	#0
+	STA	oam_shadow + 1
+	STA	oam_shadow + 2
 
 	LDA	#%10010000
 	STA	_PPUCTRL
@@ -592,6 +611,24 @@ Level0:
 
 	org	$8010
 	rorg	$0
+
+	dc.b	%11111111
+	dc.b	%11111111
+	dc.b	%11000011
+	dc.b	%11000011
+	dc.b	%11000011
+	dc.b	%11000011
+	dc.b	%11111111
+	dc.b	%11111111
+
+	dc.b	%11111111
+	dc.b	%10000001
+	dc.b	%10111101
+	dc.b	%10111101
+	dc.b	%10111101
+	dc.b	%10111101
+	dc.b	%10000001
+	dc.b	%11111111
 
 ; ###############
 ; ###############
