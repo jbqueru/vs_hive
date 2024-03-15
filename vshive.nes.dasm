@@ -463,6 +463,12 @@ SetBG:
 	LDA	#%10010000
 	STA	_PPUCTRL
 
+; *** initialize sprite location ***
+	LDA	#128
+	STA	sprite_x
+	STA	sprite_y
+
+; *** everything is initialized, wait for VBL and turn things on ***
 	LDA	#0
 	STA	vbl_count
 WaitVBLSetup2:
@@ -477,17 +483,6 @@ WaitVBLSetup2:
 	LDA	#$2
 	STA	_OAMDMA
 
-; *** reset address and scroll position after accessing PPU data ***
-	LDA	#0
-	STA	_PPUSCROLL
-	STA	_PPUSCROLL
-	LDA	#%10010000
-	STA	_PPUCTRL
-
-; *** initialize sprite location ***
-	LDA	#128
-	STA	sprite_x
-	STA	sprite_y
 
 ; #############################################################################
 ; #############################################################################
@@ -521,9 +516,6 @@ WaitVBLMain:
 	LDA	#0
 	STA	oam_shadow + 1
 	STA	oam_shadow + 2
-
-	LDA	#%10010000
-	STA	_PPUCTRL
 
 	LDA	#1
 	STA	_INPSTROBE
