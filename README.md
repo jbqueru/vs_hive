@@ -11,9 +11,13 @@ whether an actual network connection is involved.)
 
 As a special exception, the source assets for the game (images, text, music,
 movie files) as well as output from the game (screenshots, audio or video
-recordings) are also licensed under the
+recordings) are also optionally licensed under the
 [CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0/) License.
 That exception explicitly does not apply to source code or
-object/executable code.
+object/executable code, only to assets/media files.
 
-When in doubt, AGPL is always applicable.
+Licensees of the whole game can apply the same exception to their modified
+version.
+
+On the other hand, When in doubt, limit yourself to AGPL and remove the
+exception from your modified version.
