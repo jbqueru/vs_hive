@@ -146,6 +146,7 @@ _OAMDMA		equ	$4014
 ; ##                            ##
 ; ################################
 
+_INPSTROBE	equ	$4016
 _JOYPAD1	equ	$4016
 _JOYPAD2	equ	$4017
 
@@ -180,6 +181,8 @@ oam_shadow	ds.b	256
 
 vbl_count	ds.b	1
 level_bit	ds.b	1
+sprite_x	ds.b	1
+sprite_y	ds.b	1
 
 ; #############################################################################
 ; #############################################################################
@@ -481,6 +484,11 @@ WaitVBLSetup2:
 	LDA	#%10010000
 	STA	_PPUCTRL
 
+; *** initialize sprite location ***
+	LDA	#128
+	STA	sprite_x
+	STA	sprite_y
+
 ; #############################################################################
 ; #############################################################################
 ; ###                                                                       ###
@@ -502,15 +510,50 @@ WaitVBLMain:
 	LDA	#>oam_shadow
 	STA	_OAMDMA
 
-	LDA	#128
-	STA	oam_shadow + 0
+	LDA	sprite_x
 	STA	oam_shadow + 3
+	LDA	sprite_y
+	STA	oam_shadow + 0
 	LDA	#0
 	STA	oam_shadow + 1
 	STA	oam_shadow + 2
 
 	LDA	#%10010000
 	STA	_PPUCTRL
+
+	LDA	#1
+	STA	_INPSTROBE
+	LDA	#0
+	STA	_INPSTROBE
+
+	LDA	_JOYPAD1
+	LDA	_JOYPAD1
+	LDA	_JOYPAD1
+	LDA	_JOYPAD1
+
+	LDA	_JOYPAD1
+	LSR
+	BCC	UpDone
+	DEC	sprite_y
+UpDone:
+
+	LDA	_JOYPAD1
+	LSR
+	BCC	DownDone
+	INC	sprite_y
+DownDone:
+
+	LDA	_JOYPAD1
+	LSR
+	BCC	LeftDone
+	DEC	sprite_x
+LeftDone:
+
+	LDA	_JOYPAD1
+	LSR
+	BCC	RightDone
+	INC	sprite_x
+RightDone:
 
 	JMP	MainLoop
 
