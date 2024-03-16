@@ -163,6 +163,10 @@ _JOYPAD2	equ	$4017
 	seg.u	zeropage
 	org	$0000
 
+joypad:		ds.b	1
+delta_x:	ds.b	1
+delta_y:	ds.b	1
+
 	seg.u	stack
 	org	$0100
 
@@ -519,37 +523,51 @@ WaitVBLMain:
 
 	LDA	#1
 	STA	_INPSTROBE
+	STA	joypad
 	LDA	#0
 	STA	_INPSTROBE
 
-	LDA	_JOYPAD1
-	LDA	_JOYPAD1
-	LDA	_JOYPAD1
-	LDA	_JOYPAD1
-
+ReadJoypad:
 	LDA	_JOYPAD1
 	LSR
-	BCC	UpDone
-	DEC	sprite_y
-UpDone:
+	ROL	joypad
+	BCC	ReadJoypad
 
-	LDA	_JOYPAD1
-	LSR
-	BCC	DownDone
-	INC	sprite_y
-DownDone:
+	LDA	#0
+	STA	delta_x
+        STA	delta_y
 
-	LDA	_JOYPAD1
-	LSR
-	BCC	LeftDone
-	DEC	sprite_x
+	LDA	#3
+	AND	joypad
+	CMP	#1
+	BNE	RightDone
+	INC	delta_x
+RightDone:
+	CMP	#2
+	BNE	LeftDone
+	DEC	delta_x
 LeftDone:
 
-	LDA	_JOYPAD1
-	LSR
-	BCC	RightDone
-	INC	sprite_x
-RightDone:
+	LDA	#$C
+	AND	joypad
+	CMP	#$4
+	BNE	DownDone
+	INC	delta_y
+DownDone:
+	CMP	#$8
+	BNE	UpDone
+	DEC	delta_y
+UpDone:
+
+	CLC
+	LDA	delta_x
+	ADC	sprite_x
+	STA	sprite_x
+
+	CLC
+	LDA	delta_y
+	ADC	sprite_y
+	STA	sprite_y
 
 	JMP	MainLoop
 
