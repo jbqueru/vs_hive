@@ -163,7 +163,15 @@ _JOYPAD2	equ	$4017
 	seg.u	zeropage
 	org	$0000
 
-joypad:		ds.b	1
+joypad:		ds.b	1		; abspudlr
+					; |||||||+- right
+					; ||||||+-- left
+					; |||||+--- down
+					; ||||+---- up
+					; |||+----- start (pause)
+					; ||+------ select
+					; |+------- button B
+					; +-------- button A
 delta_x:	ds.b	1
 delta_y:	ds.b	1
 
