@@ -146,9 +146,20 @@ _OAMDMA		equ	$4014
 ; ##                            ##
 ; ################################
 
-_INPSTROBE	equ	$4016
-_JOYPAD1	equ	$4016
-_JOYPAD2	equ	$4017
+_INPSTROBE	equ	$4016		; W .....210
+					;        |||
+					;        ||+- output bit 0, joypad strobe
+					;        |+-- output bit 1, typically unconnected
+					;        +--- output bit 2, typically unconnected
+
+_INPPAD1	equ	$4016		; R ...tlmej
+					;      |||||
+					;      ||||+- joypad
+					;      |||+-- expansion port
+					;      ||+--- microphone
+					;      |+---- gun lightsense
+					;      +----- gun trigger
+_INPPAD2	equ	$4017		; same as $4016
 
 ; #############################################################################
 ; #############################################################################
@@ -164,6 +175,7 @@ _JOYPAD2	equ	$4017
 	org	$0000
 
 joypad:		ds.b	1		; abspudlr
+					; ||||||||
 					; |||||||+- right
 					; ||||||+-- left
 					; |||||+--- down
@@ -529,7 +541,7 @@ WaitVBLMain:
 	STA	_INPSTROBE
 
 ReadJoypad:
-	LDA	_JOYPAD1
+	LDA	_INPPAD1
 	LSR
 	ROL	joypad
 	BCC	ReadJoypad
