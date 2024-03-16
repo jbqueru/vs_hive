@@ -487,13 +487,14 @@ WaitVBLSetup2:
 	CMP	vbl_count
 	BEQ	WaitVBLSetup2
 
+; *** init OAM data to avoid bit rot from unrefreshed OAM DRAM ***
+	LDA	#$2
+	STA	_OAMDMA
+
 ; *** turn rendering on ***
 	LDA	#%00011110
 	STA	_PPUMASK
 
-; *** init OAM data ***
-	LDA	#$2
-	STA	_OAMDMA
 
 
 ; #############################################################################
