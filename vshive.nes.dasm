@@ -521,14 +521,6 @@ WaitVBLMain:
 
 ; *** done messing with OAM and PPU, prepare next frame ***
 
-	LDA	sprite_x
-	STA	oam_shadow + 3
-	LDA	sprite_y
-	STA	oam_shadow + 0
-	LDA	#0
-	STA	oam_shadow + 1
-	STA	oam_shadow + 2
-
 	LDA	#1
 	STA	_INPSTROBE
 	STA	joypad
@@ -576,6 +568,14 @@ UpDone:
 	LDA	delta_y
 	ADC	sprite_y
 	STA	sprite_y
+
+	LDA	sprite_x
+	STA	oam_shadow + 3
+	LDA	sprite_y
+	STA	oam_shadow + 0
+	LDA	#0
+	STA	oam_shadow + 1
+	STA	oam_shadow + 2
 
 	JMP	MainLoop
 
