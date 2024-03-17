@@ -645,8 +645,10 @@ WaitVBLMain:
 				;	until rendering starts
 
 ; *** update sprites first ***
-	LDA	#>oam_shadow		; 2 cycles
-	STA	_OAMDMA			; 4 + 513 or 514 cycles
+	LDA	#>oam_shadow	; 2 cycles
+	STA	_OAMDMA		; 4 + 513 or 514 cycles
+				; about 1747 cycles available from here
+				;	until rendering starts
 
 	JMP	MainLoop
 
