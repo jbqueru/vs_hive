@@ -521,44 +521,70 @@ WaitVBLSetup2:
 ; #############################################################################
 
 MainLoop:
+
+; #####################
+; #####################
+; ###               ###
+; ###  Read inputs  ###
+; ###               ###
+; #####################
+; #####################
+
+; *** Strobe the input devices so that they capture their button state ***
 	LDA	#1
 	STA	_INPSTROBE
-	STA	joypad
 	LDA	#0
 	STA	_INPSTROBE
 
+; *** Read bits serially from joypad ***
+	LDA	#1
+	STA	joypad		; Store 1 bit into that variable (ring counter)
 ReadJoypad:
-	LDA	_INPPAD1
-	LSR
-	ROL	joypad
-	BCC	ReadJoypad
+	LDA	_INPPAD1	; Read 1 serial bit from input port 1
+				;	(low bit is the joypad)
+	LSR			; Extract low bit in carry
+	ROL	joypad		; Store carry in low bit, get high bit in carry
+	BCC	ReadJoypad	; Keep going until the first bit comes
+				;	out of the ring counter
 
+; ###################
+; ###################
+; ###             ###
+; ###  Game core  ###
+; ###             ###
+; ###################
+; ###################
+
+; *** Reset motion ***
 	LDA	#0
 	STA	delta_x
-        STA	delta_y
+	STA	delta_y
 
-	LDA	#3
-	AND	joypad
-	CMP	#1
+; *** Process horizontal motion from joypad L/R ***
+	LDA	joypad
+	AND	#%00000011	; L/R are in those 2 bits, mask the rest away
+	CMP	#%00000001	; Check if R pressed but not L
 	BNE	RightDone
 	INC	delta_x
 RightDone:
-	CMP	#2
+	CMP	#%00000010	; Check if L pressed but not R
 	BNE	LeftDone
 	DEC	delta_x
 LeftDone:
 
-	LDA	#$C
-	AND	joypad
-	CMP	#$4
+; *** Process horizontal motion from joypad U/D ***
+	LDA	joypad
+	AND	#%00001100	; U/D aare in those 2 bits, mask the rest away
+	CMP	#%00000100	; Check if D pressed but not U
 	BNE	DownDone
 	INC	delta_y
 DownDone:
-	CMP	#$8
+	CMP	#%00001000	; Check if U pressed but not D
 	BNE	UpDone
 	DEC	delta_y
 UpDone:
 
+; *** Move player ***
 	CLC
 	LDA	delta_x
 	ADC	sprite_x
@@ -569,6 +595,14 @@ UpDone:
 	ADC	sprite_y
 	STA	sprite_y
 
+; ###############################
+; ###############################
+; ###                         ###
+; ###  Prepare graphics data  ###
+; ###                         ###
+; ###############################
+; ###############################
+
 	LDA	sprite_x
 	STA	oam_shadow + 3
 	LDA	sprite_y
@@ -577,19 +611,25 @@ UpDone:
 	STA	oam_shadow + 1
 	STA	oam_shadow + 2
 
+; ##############################
+; ##############################
+; ###                        ###
+; ###  Send graphics to PPU  ###
+; ###                        ###
+; ##############################
+; ##############################
+
 	LDA	#0
 	STA	vbl_count
 WaitVBLMain:
-	CMP	vbl_count		; 4 cycles
-	BEQ	WaitVBLMain		; 2 cycles when not taken
-					; about 2267 cycles available from here
-					;   until rendering starts
+	CMP	vbl_count	; 4 cycles
+	BEQ	WaitVBLMain	; 2 cycles when not taken
+				; about 2267 cycles available from here
+				;	until rendering starts
 
 ; *** update sprites first ***
 	LDA	#>oam_shadow		; 2 cycles
 	STA	_OAMDMA			; 4 + 513 or 514 cycles
-
-; *** done messing with OAM and PPU, prepare next frame ***
 
 	JMP	MainLoop
 
