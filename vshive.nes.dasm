@@ -588,11 +588,28 @@ UpDone:
 	CLC
 	LDA	delta_x
 	ADC	sprite_x
+
+	CMP	#32
+	BCS	OKLeft
+	LDA	#32
+OKLeft:
+	CMP	#224
+	BCC	OKRight
+	LDA	#224
+OKRight:
 	STA	sprite_x
 
 	CLC
 	LDA	delta_y
 	ADC	sprite_y
+	CMP	#40
+	BCS	OKTop
+	LDA	#40
+OKTop:
+	CMP	#216
+	BCC	OKBottom
+	LDA	#216
+OKBottom:
 	STA	sprite_y
 
 ; ###############################
