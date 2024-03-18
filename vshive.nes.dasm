@@ -685,6 +685,8 @@ OKRight:
 	LDA	sprite_x
 	STA	oam_shadow + 3
 	LDA	sprite_y
+	SEC
+	SBC	#1			; correct for sprite off-by-one on Y
 	STA	oam_shadow + 0
 	LDA	#0
 	STA	oam_shadow + 1
