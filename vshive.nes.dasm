@@ -292,7 +292,8 @@ Reset:
 
 	LDA	#0
 	STA	_APUDMCCTRL	; disable DMC interrupts
-	LDX	_APUSTATUS	; clear DMC pending interrupt (as a side effect of reading that register)
+	LDX	_APUSTATUS	; clear DMC pending interrupt (as a side effect
+				;    of reading that register)
 	STA	_APUSTATUS	; disable audio
 
 ; **************************
@@ -303,10 +304,10 @@ Reset:
 
 PollVBLInit1:
 	BIT	_PPUSTATUS
-	NOP			; pad loop so that it's neither a multiple of 8 clocks nor of 11 clocks
-				; that's because the dendy frame takes a whole number of cycles that's
-				; a multiple of both 8 and 11, and there's a known race condition where
-				; the bit could be read as zero *and* cleared by a poorly times read.
+	NOP				; pad loop so that it's neither a multiple of 8 clocks nor of 11 clocks
+					; that's because the dendy frame takes a whole number of cycles that's
+					; a multiple of both 8 and 11, and there's a known race condition where
+					; the bit could be read as zero *and* cleared by a poorly times read.
 	BPL	PollVBLInit1
 
 ; ***************
@@ -338,10 +339,10 @@ InitRAM:
 
 PollVBLInit2:
 	BIT	_PPUSTATUS
-	NOP			; pad loop so that it's neither a multiple of 8 clocks nor of 11 clocks
-				; that's because the dendy frame takes a whole number of cycles that's
-				; a multiple of both 8 and 11, and there's a known race condition where
-				; the bit could be read as zero *and* cleared by a poorly times read.
+	NOP				; pad loop so that it's neither a multiple of 8 clocks nor of 11 clocks
+					; that's because the dendy frame takes a whole number of cycles that's
+					; a multiple of both 8 and 11, and there's a known race condition where
+					; the bit could be read as zero *and* cleared by a poorly times read.
 	BPL	PollVBLInit2
 ; From this point PPU is ready to use
 
@@ -356,12 +357,14 @@ PollVBLInit2:
 ; *** init PPU ***
 	LDA	#0
 	STA	_PPUMASK	; disable graphics
-	LDX	_PPUSTATUS	; clear NMI VBL pending interrupt (as side effect of readng that register)
+	LDX	_PPUSTATUS	; clear NMI VBL pending interrupt (as side
+				;    effect of readng that register)
 	LDA	#%10010000	; enable NMI
 	STA	_PPUCTRL
 
 ; *** clear VRAM ***
-; unlike plain RAM, the VRAM pointer _PPUADDR auto-increments, so it's easier to clear a large area.
+; unlike plain RAM, the VRAM pointer _PPUADDR auto-increments, so it's easier
+;    to clear a large area.
 	LDX	#>$2000
 	LDY	#<$2000
 	STX	_PPUADDR	; set PPU Address to $2000, beginning of VRAM
