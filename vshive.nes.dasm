@@ -598,6 +598,7 @@ UpDone:
 					; A already contains delta_y from previous operation
 	CLC
 	ADC	sprite_y
+	; CLC				; Carry is already clear from previous operation
 	ADC	#7			; 7 pixels down from top-left
 	TAY
 
@@ -623,13 +624,11 @@ UpDone:
 
 CollideDownAdjust:
 	CLC
-	LDA	delta_y			; Compute y coordinate of bottom row of sprite
+	LDA	delta_y
 	ADC	sprite_y
-	ADC	#7
-	AND	#%11111000		; Compute y coordinate of top of tile that the sprite collided with
-					;    (it's really simpliy rounding down to 8 pixels)
-	SEC
-	SBC	#8			; The sprite is 8 pixels higher than that
+	AND	#%11111000		; Align sprite on 8 pixels vertically
+					;    That works because the sprite height is a multiple of 8
+					;    Other heights need an adjustment
 	STA	sprite_y
 	JMP	VertDone
 
@@ -652,6 +651,8 @@ VertDone:
 	LDA	delta_x
 	BEQ	HorizDone
 	BMI	CollideRightClear
+
+	; LDA	delta_x
 	CLC
 	ADC	sprite_x
 	ADC	#7
