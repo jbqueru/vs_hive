@@ -593,47 +593,10 @@ UpDone:
 	CLC
 	ADC	sprite_y
 	ADC	#7
-
-	LSR			; Divide by 8 (8 pixels per tile)
-	LSR
-	LSR
-
-	ASL			; 4 bytes per row
-	ASL
-
-	STA	coll_addr
-
-	LDA	sprite_x
-
-	LSR			; Divide by 8 (8 pixels per tile)
-	LSR
-	LSR
-
-	LSR			; 8 bits per byte
-	LSR
-	LSR
-
-	CLC
-	ADC	coll_addr
 	TAY
 
-	LDA	sprite_x
-
-	LSR			; Divide by 8 (8 pixels per tile)
-	LSR
-	LSR
-
-	AND	#7		; Extract bit number
-
-	TAX
-	LDA	#0
-	SEC
-Shift:
-	ROR
-	DEX
-	BPL	Shift
-
-	AND	Level0,Y
+	LDX	sprite_x
+	JSR	CheckCollision
 	BEQ	FallChecked
 
 	CLC
@@ -733,6 +696,75 @@ NMIHandler:
 
 IRQHandler:
 	RTI
+
+; #############################################################################
+; #############################################################################
+; ###                                                                       ###
+; ###                                                                       ###
+; ###                            Helper Routines                            ###
+; ###                                                                       ###
+; ###                                                                       ###
+; #############################################################################
+; #############################################################################
+
+; ####################################
+; ####################################
+; ###                              ###
+; ###  Background Collision Check  ###
+; ###                              ###
+; ####################################
+; ####################################
+
+CheckCollision:
+; Input: x and y in registers X and Y (!!!)
+; Output: Z flag, set if there's a collision
+; Modifies: AXYP and coll_addr
+
+	TYA
+
+	LSR			; Divide by 8 (8 pixels per tile)
+	LSR
+	LSR
+
+	ASL			; 4 bytes per row
+	ASL
+
+	STA	coll_addr
+
+	TXA
+
+	LSR			; Divide by 8 (8 pixels per tile)
+	LSR
+	LSR
+
+	LSR			; 8 bits per byte
+	LSR
+	LSR
+
+	CLC
+	ADC	coll_addr
+	TAY
+
+	TXA
+
+	LSR			; Divide by 8 (8 pixels per tile)
+	LSR
+	LSR
+
+	AND	#7		; Extract bit number
+
+	TAX
+	LDA	#0
+	SEC
+.Shift:
+	ROR
+	DEX
+	BPL	.Shift
+
+	AND	Level0,Y
+
+	RTS
+
 
 ; #############################################################################
 ; #############################################################################
