@@ -187,6 +187,7 @@ joypad:		ds.b	1		; abspudlr
 					; +-------- button A
 delta_x:	ds.b	1
 delta_y:	ds.b	1
+coll_addr:	ds.b	1
 
 	seg.u	stack
 	org	$0100
@@ -585,6 +586,66 @@ DownDone:
 UpDone:
 
 ; *** Move player ***
+
+	LDA	delta_y
+	BEQ	VertDone
+	BMI	FallChecked
+	CLC
+	ADC	sprite_y
+	ADC	#8
+
+	LSR			; Divide by 8 (8 pixels per tile)
+	LSR
+	LSR
+
+	ASL			; 4 bytes per row
+	ASL
+
+	STA	coll_addr
+
+	LDA	sprite_x
+
+	LSR			; Divide by 8 (8 pixels per tile)
+	LSR
+	LSR
+
+	LSR			; 8 bits per byte
+	LSR
+	LSR
+
+	CLC
+	ADC	coll_addr
+	TAY
+
+	LDA	sprite_x
+
+	LSR			; Divide by 8 (8 pixels per tile)
+	LSR
+	LSR
+
+	AND	#7		; Extract bit number
+
+	TAX
+	LDA	#0
+	SEC
+Shift:
+	ROR
+	DEX
+	BPL	Shift
+
+	AND	Level0,Y
+	BEQ	FallChecked
+
+	CLC
+	LDA	delta_y
+	ADC	sprite_y
+	ADC	#8
+	AND	#%11111000
+	SBC	#8
+	STA	sprite_y
+	JMP	VertDone
+
+FallChecked:
 	CLC
 	LDA	delta_y
 	ADC	sprite_y
@@ -597,6 +658,7 @@ OKTop:
 	LDA	#216
 OKBottom:
 	STA	sprite_y
+VertDone:
 
 	CLC
 	LDA	delta_x
