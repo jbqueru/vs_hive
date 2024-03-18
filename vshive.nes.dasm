@@ -640,8 +640,46 @@ OKBottom:
 	STA	sprite_y
 VertDone:
 
+	LDA	delta_x
+	BEQ	HorizDone
+	BMI	CollideRightClear
+	CLC
+	ADC	sprite_x
+	ADC	#7
+	TAX
+
+	LDY	sprite_y
+	JSR	CheckCollision
+	BNE	CollideRightAdjust
+
+	LDA	sprite_y
+	CLC
+	ADC	#7
+	TAY
+
+	LDA	delta_x
+	ADC	sprite_x
+	ADC	#7
+	TAX
+
+	JSR	CheckCollision
+	BEQ	CollideRightClear
+
+
+CollideRightAdjust:
 	CLC
 	LDA	delta_x
+	ADC	sprite_x
+	ADC	#7
+	AND	#%11111000
+	SEC
+	SBC	#8
+	STA	sprite_x
+	JMP	HorizDone
+
+CollideRightClear:
+	LDA	delta_x
+	CLC
 	ADC	sprite_x
 
 	CMP	#32
@@ -653,6 +691,7 @@ OKLeft:
 	LDA	#224
 OKRight:
 	STA	sprite_x
+HorizDone:
 
 ; ###############################
 ; ###############################
