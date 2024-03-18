@@ -597,8 +597,22 @@ UpDone:
 
 	LDX	sprite_x
 	JSR	CheckCollision
+	BNE	FallCollide
+
+	LDA	delta_y
+	CLC
+	ADC	sprite_y
+	ADC	#7
+	TAY
+
+	LDA	sprite_x
+	ADC	#7
+	TAX
+
+	JSR	CheckCollision
 	BEQ	FallChecked
 
+FallCollide:
 	CLC
 	LDA	delta_y
 	ADC	sprite_y
