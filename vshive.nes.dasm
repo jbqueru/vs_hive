@@ -592,7 +592,7 @@ UpDone:
 	BMI	FallChecked
 	CLC
 	ADC	sprite_y
-	ADC	#8
+	ADC	#7
 
 	LSR			; Divide by 8 (8 pixels per tile)
 	LSR
@@ -639,8 +639,9 @@ Shift:
 	CLC
 	LDA	delta_y
 	ADC	sprite_y
-	ADC	#8
+	ADC	#7
 	AND	#%11111000
+	SEC
 	SBC	#8
 	STA	sprite_y
 	JMP	VertDone
