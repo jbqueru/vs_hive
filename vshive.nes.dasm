@@ -590,7 +590,7 @@ UpDone:
 
 	LDA	delta_y
 	BEQ	VertDone
-	BMI	FallChecked
+	BMI	CollideDownClear
 	CLC
 	ADC	sprite_y
 	ADC	#7
@@ -598,7 +598,7 @@ UpDone:
 
 	LDX	sprite_x
 	JSR	CheckCollision
-	BNE	FallCollide
+	BNE	CollideDownAdjust
 
 	LDA	delta_y
 	CLC
@@ -611,9 +611,9 @@ UpDone:
 	TAX
 
 	JSR	CheckCollision
-	BEQ	FallChecked
+	BEQ	CollideDownClear
 
-FallCollide:
+CollideDownAdjust:
 	CLC
 	LDA	delta_y
 	ADC	sprite_y
@@ -624,10 +624,11 @@ FallCollide:
 	STA	sprite_y
 	JMP	VertDone
 
-FallChecked:
-	CLC
+CollideDownClear:
 	LDA	delta_y
+	CLC
 	ADC	sprite_y
+
 	CMP	#40
 	BCS	OKTop
 	LDA	#40
