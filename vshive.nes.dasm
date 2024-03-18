@@ -590,40 +590,46 @@ DownDone:
 UpDone:
 
 ; *** Move player ***
-
 	LDA	delta_y
-	BEQ	VertDone
-	BMI	CollideDownClear
+	BEQ	VertDone		; No vertical motion, no need to check for vertical collisions
+	BMI	CollideDownClear	; Moving up, no need to check for bottom collisions
+
+	; LDA	delta_y			; Compute coordinates of bottom-left corner after planned vertical motion
+					; A already contains delta_y from previous operation
 	CLC
 	ADC	sprite_y
-	ADC	#7
+	ADC	#7			; 7 pixels down from top-left
 	TAY
 
 	LDX	sprite_x
-	JSR	CheckCollision
-	BNE	CollideDownAdjust
 
-	LDA	delta_y
+	JSR	CheckCollision
+	BNE	CollideDownAdjust	; Collision detected, adjust y accordingly
+
+	LDA	delta_y			; Compute coordinates of bottom-right corner after planned vertical motion
 	CLC
 	ADC	sprite_y
-	ADC	#7
+	; CLC				; Carry is already clear from previous operation
+	ADC	#7			; 7 pixels from top-left
 	TAY
 
 	LDA	sprite_x
-	ADC	#7
+	; CLC				; Carry is already clear from previous operation
+	ADC	#7			; 7 pixels from top-left
 	TAX
 
 	JSR	CheckCollision
-	BEQ	CollideDownClear
+	BEQ	CollideDownClear	; No collision detected, this was the last test, bail out.
 
 CollideDownAdjust:
 	CLC
-	LDA	delta_y
+	LDA	delta_y			; Compute y coordinate of bottom row of sprite
 	ADC	sprite_y
 	ADC	#7
-	AND	#%11111000
+	AND	#%11111000		; Compute y coordinate of top of tile that the sprite collided with
+					;    (it's really simpliy rounding down to 8 pixels)
 	SEC
-	SBC	#8
+	SBC	#8			; The sprite is 8 pixels higher than that
 	STA	sprite_y
 	JMP	VertDone
 
