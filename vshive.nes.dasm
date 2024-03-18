@@ -720,50 +720,49 @@ CheckCollision:
 ; Output: Z flag, set if there's a collision
 ; Modifies: AXYP and coll_addr
 
+; Divide y by 8 to get the tile row, then multiply by 4 to get the
+;    address offset of that row.
+; It's cheaper to divide by 2 and clear the unnecessary bits: there
+;    are 4 bytes for 8 pixels, i.e. 1 byte every 2 pixels (plus rounding).
 	TYA
-
-	LSR			; Divide by 8 (8 pixels per tile)
-	LSR
-	LSR
-
-	ASL			; 4 bytes per row
-	ASL
-
+	LSR			; divide by 2
+	AND	#%11111100	; round to row address offset
 	STA	coll_addr
 
+; Divide x by 8 to get the tile column, then divide by 8 again to
+;    get the address offset of that column.
+; That makes sense, there are 4 bytes for 256 pixels, i.e. 64 pixels
+;    per byte.
+; While locally there's a faster way to shift by 6 bits, we do it
+;    the basic way because we'll later need the same value shifted
+;    by only 3 bits.
 	TXA
-
-	LSR			; Divide by 8 (8 pixels per tile)
+	LSR			; divide by 8 to get the tile number
 	LSR
 	LSR
-
-	LSR			; 8 bits per byte
+	TAX			; store back since we'll need it later
+	LSR			; divide by 8 to get the column offset
 	LSR
 	LSR
 
 	CLC
-	ADC	coll_addr
+	ADC	coll_addr	; compute the full offset into the level map
 	TAY
 
 	TXA
-
-	LSR			; Divide by 8 (8 pixels per tile)
-	LSR
-	LSR
-
-	AND	#7		; Extract bit number
+	AND	#7		; extract bit number
 
 	TAX
+	SEC			; set the bit to shift
 	LDA	#0
-	SEC
 .Shift:
-	ROR
+	ROR			; non-standard bit numbering, 0 is MSB
 	DEX
 	BPL	.Shift
 
-	AND	Level0,Y
+	AND	Level0,Y	; check the one bit we care about
 
-	RTS
+	RTS			; and we're done!
 
 
 ; #############################################################################
