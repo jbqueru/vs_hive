@@ -21,13 +21,20 @@
 ;
 ; SPDX-License-Identifier: AGPL-3.0-or-later
 
-; Source format:
+; Coding style:
 ;	- ASCII
 ;	- hard tabs, 8 characters wide, except in ASCII art
 ;	- 120 columns overall
 ;	- Standalone block comments in the first 80 columns
 ;	- Code-related block comments allowed in the last 80 columns
 ;	- Rulers at 40, 80 and 120 columns help source width
+;	- Symbols for code are CamelCase
+;	- Symbols for variables are snake_case
+;	- Symbols for hardware registers are ALL_CAPS
+;	- Related symbols start with the same prefix (so they sort together)
+;	- Include but comment out instructions that help readability but
+;		don't do anything (e.g. redundant CLC when the carry is
+;		guaranteed already to be clear)
 
 ; #############################################################################
 ; #############################################################################
