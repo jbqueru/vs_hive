@@ -560,39 +560,50 @@ ReadJoypad:
 ; ###################
 ; ###################
 
-; *** Reset motion ***
+; *** Default motion is not to move ***
 	LDA	#0
 	STA	delta_x
 	STA	delta_y
+
+; ********************************
+; **                            **
+; ** Process inputs into motion **
+; **                            **
+; ********************************
 
 ; *** Process horizontal motion from joypad L/R ***
 	LDA	joypad
 	AND	#%00000011	; L/R are in those 2 bits, mask the rest away
 	CMP	#%00000001	; Check if R pressed but not L
-	BNE	RightDone
+	BNE	InputRightDone
 	INC	delta_x
-RightDone:
+InputRightDone:
 	CMP	#%00000010	; Check if L pressed but not R
-	BNE	LeftDone
+	BNE	InputLeftDone
 	DEC	delta_x
-LeftDone:
+InputLeftDone:
 
 ; *** Process horizontal motion from joypad U/D ***
 	LDA	joypad
 	AND	#%00001100	; U/D aare in those 2 bits, mask the rest away
 	CMP	#%00000100	; Check if D pressed but not U
-	BNE	DownDone
+	BNE	InputDownDone
 	INC	delta_y
-DownDone:
+InputDownDone:
 	CMP	#%00001000	; Check if U pressed but not D
-	BNE	UpDone
+	BNE	InputUpDone
 	DEC	delta_y
-UpDone:
+InputUpDone:
 
-; *** Move player ***
+; ***************************************
+; **                                   **
+; ** Move player with collision checks **
+; **                                   **
+; ***************************************
+
 	LDA	delta_y
-	BEQ	VertDone		; No vertical motion, no need to check for vertical collisions
-	BMI	CheckCollideUp		; Moving up, no need to check for bottom collisions
+	BEQ	MoveVertDone		; No vertical motion, no need to check for vertical collisions
+	BMI	CollideUpCheck		; Moving up, no need to check for bottom collisions
 
 	; LDA	delta_y			; Compute coordinates of bottom-left corner after planned vertical motion
 					; A already contains delta_y from previous operation
@@ -620,7 +631,7 @@ UpDone:
 	TAX
 
 	JSR	CheckCollision
-	BEQ	CollideDownClear	; No collision detected, this was the last test, bail out.
+	BEQ	CollideVertNone		; No collision detected, this was the last test, bail out.
 
 CollideDownAdjust:
 	CLC
@@ -630,9 +641,9 @@ CollideDownAdjust:
 					;    That works because the sprite height is a multiple of 8
 					;    Other heights need an adjustment
 	STA	sprite_y
-	JMP	VertDone
+	JMP	MoveVertDone
 
-CheckCollideUp:
+CollideUpCheck:
 ;	LDA	delta_y
 	CLC
 	ADC	sprite_y
@@ -654,7 +665,7 @@ CheckCollideUp:
 	TAX
 
 	JSR	CheckCollision
-	BEQ	CollideDownClear
+	BEQ	CollideVertNone
 
 CollideUpAdjust:
 	CLC
@@ -666,27 +677,27 @@ CollideUpAdjust:
 					;    That works because the sprite height is a multiple of 8
 					;    Other heights need an adjustment
 	STA	sprite_y
-	JMP	VertDone
+	JMP	MoveVertDone
 
-CollideDownClear:
+CollideVertNone:
 	LDA	delta_y
 	CLC
 	ADC	sprite_y
 
 	CMP	#40
-	BCS	OKTop
+	BCS	MoveTopOK
 	LDA	#40
-OKTop:
+MoveTopOK:
 	CMP	#216
-	BCC	OKBottom
+	BCC	MoveBottomOK
 	LDA	#216
-OKBottom:
+MoveBottomOK:
 	STA	sprite_y
-VertDone:
+MoveVertDone:
 
 	LDA	delta_x
-	BEQ	HorizDone
-	BMI	CheckCollideLeft
+	BEQ	MoveHorizDone
+	BMI	CollideLeftCheck
 
 	; LDA	delta_x
 	CLC
@@ -709,7 +720,7 @@ VertDone:
 	TAX
 
 	JSR	CheckCollision
-	BEQ	CollideRightClear
+	BEQ	CollideHorizNone
 
 CollideRightAdjust:
 	CLC
@@ -720,9 +731,9 @@ CollideRightAdjust:
 	SEC
 	SBC	#8
 	STA	sprite_x
-	JMP	HorizDone
+	JMP	MoveHorizDone
 
-CheckCollideLeft:
+CollideLeftCheck:
 ;	LDA	delta_x
 	CLC
 	ADC	sprite_x
@@ -743,7 +754,7 @@ CheckCollideLeft:
 	TAX
 
 	JSR	CheckCollision
-	BEQ	CollideRightClear
+	BEQ	CollideHorizNone
 
 CollideLeftAdjust:
 	CLC
@@ -755,23 +766,23 @@ CollideLeftAdjust:
 					;    That works because the sprite height is a multiple of 8
 					;    Other heights need an adjustment
 	STA	sprite_x
-	JMP	HorizDone
+	JMP	MoveHorizDone
 
-CollideRightClear:
+CollideHorizNone:
 	LDA	delta_x
 	CLC
 	ADC	sprite_x
 
 	CMP	#32
-	BCS	OKLeft
+	BCS	MoveLeftOK
 	LDA	#32
-OKLeft:
+MoveLeftOK:
 	CMP	#224
-	BCC	OKRight
+	BCC	MoverightOK
 	LDA	#224
-OKRight:
+MoverightOK:
 	STA	sprite_x
-HorizDone:
+MoveHorizDone:
 
 ; ###############################
 ; ###############################
