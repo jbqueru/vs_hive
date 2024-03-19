@@ -592,7 +592,7 @@ UpDone:
 ; *** Move player ***
 	LDA	delta_y
 	BEQ	VertDone		; No vertical motion, no need to check for vertical collisions
-	BMI	CollideDownClear	; Moving up, no need to check for bottom collisions
+	BMI	CheckCollideUp		; Moving up, no need to check for bottom collisions
 
 	; LDA	delta_y			; Compute coordinates of bottom-left corner after planned vertical motion
 					; A already contains delta_y from previous operation
@@ -632,6 +632,42 @@ CollideDownAdjust:
 	STA	sprite_y
 	JMP	VertDone
 
+CheckCollideUp:
+;	LDA	delta_y
+	CLC
+	ADC	sprite_y
+	TAY
+
+	LDX	sprite_x
+
+	JSR	CheckCollision
+	BNE	CollideUpAdjust
+
+	LDA	delta_y
+	CLC
+	ADC	sprite_y
+	TAY
+
+	LDA	sprite_x
+	; SEC				; Carry is always set from previous operation
+	ADC	#6
+	TAX
+
+	JSR	CheckCollision
+	BEQ	CollideDownClear
+
+CollideUpAdjust:
+	CLC
+	LDA	delta_y
+	ADC	sprite_y
+	CLC
+	ADC	#8
+	AND	#%11111000		; Align sprite on 8 pixels vertically
+					;    That works because the sprite height is a multiple of 8
+					;    Other heights need an adjustment
+	STA	sprite_y
+	JMP	VertDone
+
 CollideDownClear:
 	LDA	delta_y
 	CLC
@@ -650,7 +686,7 @@ VertDone:
 
 	LDA	delta_x
 	BEQ	HorizDone
-	BMI	CollideRightClear
+	BMI	CheckCollideLeft
 
 	; LDA	delta_x
 	CLC
@@ -675,7 +711,6 @@ VertDone:
 	JSR	CheckCollision
 	BEQ	CollideRightClear
 
-
 CollideRightAdjust:
 	CLC
 	LDA	delta_x
@@ -684,6 +719,41 @@ CollideRightAdjust:
 	AND	#%11111000
 	SEC
 	SBC	#8
+	STA	sprite_x
+	JMP	HorizDone
+
+CheckCollideLeft:
+;	LDA	delta_x
+	CLC
+	ADC	sprite_x
+	TAX
+
+	LDY	sprite_y
+
+	JSR	CheckCollision
+	BNE	CollideLeftAdjust
+
+	LDA	sprite_y
+	CLC
+	ADC	#7
+	TAY
+
+	LDA	delta_x
+	ADC	sprite_x
+	TAX
+
+	JSR	CheckCollision
+	BEQ	CollideRightClear
+
+CollideLeftAdjust:
+	CLC
+	LDA	delta_x
+	ADC	sprite_x
+	CLC
+	ADC	#8
+	AND	#%11111000		; Align sprite on 8 pixels vertically
+					;    That works because the sprite height is a multiple of 8
+					;    Other heights need an adjustment
 	STA	sprite_x
 	JMP	HorizDone
 
