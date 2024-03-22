@@ -608,6 +608,95 @@ InputUpDone:
 ; **                                   **
 ; ***************************************
 
+	LDA	delta_x
+	BEQ	MoveHorizDone
+	BMI	CollideLeftCheck
+
+	; LDA	delta_x
+	CLC
+	ADC	sprite_x
+	ADC	#7
+	TAX
+
+	LDY	sprite_y
+	JSR	CheckCollision
+	BNE	CollideRightAdjust
+
+	LDA	sprite_y
+	CLC
+	ADC	#7
+	TAY
+
+	LDA	delta_x
+	ADC	sprite_x
+	ADC	#7
+	TAX
+
+	JSR	CheckCollision
+	BEQ	CollideHorizNone
+
+CollideRightAdjust:
+	CLC
+	LDA	delta_x
+	ADC	sprite_x
+	ADC	#7
+	AND	#%11111000
+	SEC
+	SBC	#8
+	STA	sprite_x
+	JMP	MoveHorizDone
+
+CollideLeftCheck:
+;	LDA	delta_x
+	CLC
+	ADC	sprite_x
+	TAX
+
+	LDY	sprite_y
+
+	JSR	CheckCollision
+	BNE	CollideLeftAdjust
+
+	LDA	sprite_y
+	CLC
+	ADC	#7
+	TAY
+
+	LDA	delta_x
+	ADC	sprite_x
+	TAX
+
+	JSR	CheckCollision
+	BEQ	CollideHorizNone
+
+CollideLeftAdjust:
+	CLC
+	LDA	delta_x
+	ADC	sprite_x
+	CLC
+	ADC	#8
+	AND	#%11111000		; Align sprite on 8 pixels vertically
+					;    That works because the sprite height is a multiple of 8
+					;    Other heights need an adjustment
+	STA	sprite_x
+	JMP	MoveHorizDone
+
+CollideHorizNone:
+	LDA	delta_x
+	CLC
+	ADC	sprite_x
+
+	CMP	#32
+	BCS	MoveLeftOK
+	LDA	#32
+MoveLeftOK:
+	CMP	#224
+	BCC	MoverightOK
+	LDA	#224
+MoverightOK:
+	STA	sprite_x
+MoveHorizDone:
+
 	LDA	delta_y
 	BEQ	MoveVertDone		; No vertical motion, no need to check for vertical collisions
 	BMI	CollideUpCheck		; Moving up, no need to check for bottom collisions
@@ -701,95 +790,6 @@ MoveTopOK:
 MoveBottomOK:
 	STA	sprite_y
 MoveVertDone:
-
-	LDA	delta_x
-	BEQ	MoveHorizDone
-	BMI	CollideLeftCheck
-
-	; LDA	delta_x
-	CLC
-	ADC	sprite_x
-	ADC	#7
-	TAX
-
-	LDY	sprite_y
-	JSR	CheckCollision
-	BNE	CollideRightAdjust
-
-	LDA	sprite_y
-	CLC
-	ADC	#7
-	TAY
-
-	LDA	delta_x
-	ADC	sprite_x
-	ADC	#7
-	TAX
-
-	JSR	CheckCollision
-	BEQ	CollideHorizNone
-
-CollideRightAdjust:
-	CLC
-	LDA	delta_x
-	ADC	sprite_x
-	ADC	#7
-	AND	#%11111000
-	SEC
-	SBC	#8
-	STA	sprite_x
-	JMP	MoveHorizDone
-
-CollideLeftCheck:
-;	LDA	delta_x
-	CLC
-	ADC	sprite_x
-	TAX
-
-	LDY	sprite_y
-
-	JSR	CheckCollision
-	BNE	CollideLeftAdjust
-
-	LDA	sprite_y
-	CLC
-	ADC	#7
-	TAY
-
-	LDA	delta_x
-	ADC	sprite_x
-	TAX
-
-	JSR	CheckCollision
-	BEQ	CollideHorizNone
-
-CollideLeftAdjust:
-	CLC
-	LDA	delta_x
-	ADC	sprite_x
-	CLC
-	ADC	#8
-	AND	#%11111000		; Align sprite on 8 pixels vertically
-					;    That works because the sprite height is a multiple of 8
-					;    Other heights need an adjustment
-	STA	sprite_x
-	JMP	MoveHorizDone
-
-CollideHorizNone:
-	LDA	delta_x
-	CLC
-	ADC	sprite_x
-
-	CMP	#32
-	BCS	MoveLeftOK
-	LDA	#32
-MoveLeftOK:
-	CMP	#224
-	BCC	MoverightOK
-	LDA	#224
-MoverightOK:
-	STA	sprite_x
-MoveHorizDone:
 
 ; ###############################
 ; ###############################
