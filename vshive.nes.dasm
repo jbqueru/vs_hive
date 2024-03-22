@@ -572,6 +572,33 @@ ReadJoypad:
 	STA	delta_x
 	STA	delta_y
 
+; ********************
+; **                **
+; ** Handle physics **
+; **                **
+; ********************
+
+	LDX	sprite_x
+	LDA	sprite_y
+	CLC
+	ADC	#8
+	TAY
+	JSR	CheckCollision
+	BNE	OnPlatform
+
+	LDA	sprite_x
+	CLC
+	ADC	#7
+	TAX
+	LDA	sprite_y
+	ADC	#8
+	TAY
+	JSR	CheckCollision
+	BNE	OnPlatform
+
+	INC	delta_y
+OnPlatform:
+
 ; ********************************
 ; **                            **
 ; ** Process inputs into motion **
@@ -595,10 +622,11 @@ InputLeftDone:
 	AND	#%00001100	; U/D are in those 2 bits, mask the rest away
 	CMP	#%00000100	; Check if D pressed but not U
 	BNE	InputDownDone
-	INC	delta_y
+;	INC	delta_y
 InputDownDone:
 	CMP	#%00001000	; Check if U pressed but not D
 	BNE	InputUpDone
+	DEC	delta_y
 	DEC	delta_y
 InputUpDone:
 
