@@ -590,9 +590,9 @@ InputRightDone:
 	DEC	delta_x
 InputLeftDone:
 
-; *** Process horizontal motion from joypad U/D ***
+; *** Process vertical motion from joypad U/D ***
 	LDA	joypad
-	AND	#%00001100	; U/D aare in those 2 bits, mask the rest away
+	AND	#%00001100	; U/D are in those 2 bits, mask the rest away
 	CMP	#%00000100	; Check if D pressed but not U
 	BNE	InputDownDone
 	INC	delta_y
