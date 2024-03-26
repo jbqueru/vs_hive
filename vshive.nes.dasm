@@ -589,15 +589,15 @@ ReadJoypad:
 ; *** Process horizontal motion from joypad L/R ***
 InputHoriz:
 	LDA	joypad
-	AND	#%00000011	; L/R are in those 2 bits, mask the rest away
+	AND	#%00000011		; L/R are in those 2 bits, mask the rest away
 .checkLeft:
-	CMP	#%00000010	; Check if L pressed but not R
+	CMP	#%00000010		; Check if L pressed but not R
 	BNE	.doneLeft
 	DEC	delta_x
 	JMP	.doneAll
 .doneLeft:
 .checkRight:
-	CMP	#%00000001	; Check if R pressed but not L
+	CMP	#%00000001		; Check if R pressed but not L
 	BNE	.doneRight
 	INC	delta_x
 .doneRight:
@@ -637,6 +637,7 @@ CollideHoriz:
 	;BNE	.leftMoveWithCollision	; There's a collision on the bottom left, adjust accordingly
 					; Skip: fall through
 
+; *** Move sprite to the left when there's a collision ***
 .leftMoveWithCollision:
 	LDA	sprite_x
 	CLC
@@ -648,6 +649,7 @@ CollideHoriz:
 	JMP	.done
 
 .rightCheck:
+; *** Check collision of top-right corner ***
 	;LDA	delta_x			; Skip: A already contains delta_x
 	CLC
 	ADC	sprite_x
@@ -660,6 +662,7 @@ CollideHoriz:
 	JSR	CheckCollision
 	BNE	.rightMoveWithCollision	; There's a collision on the top-right, adjuste accordingly
 
+; *** Check collision of bottom-right corner ***
 	LDA	delta_x
 	CLC
 	ADC	sprite_x
@@ -677,6 +680,7 @@ CollideHoriz:
 	;BNE	.rightMoveWithCollision	; Skip: fall through
 
 .rightMoveWithCollision:
+; *** Move sprite to the right when there's a collision ***
 	LDA	delta_x
 	CLC
 	ADC	sprite_x
@@ -690,6 +694,7 @@ CollideHoriz:
 	JMP	.done
 
 .moveFree:
+; *** Move sprite horizontally when there's no collision ***
 	LDA	delta_x
 	CLC
 	ADC	sprite_x
