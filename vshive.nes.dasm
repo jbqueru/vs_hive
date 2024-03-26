@@ -590,20 +590,59 @@ InputHoriz:
 	AND	#%00000011	; L/R are in those 2 bits, mask the rest away
 .checkLeft:
 	CMP	#%00000010	; Check if L pressed but not R
-	BNE	.checkRight
+	BNE	.doneLeft
 	DEC	delta_x
 	JMP	.done
+.doneLeft:
 .checkRight:
 	CMP	#%00000001	; Check if R pressed but not L
-	BNE	.done
+	BNE	.doneRight
 	INC	delta_x
+.doneRight:
 .done:
 
 CollideHoriz:
 	LDA	delta_x
 	BEQ	MoveHorizDone
-	BMI	CollideLeftCheck
+	BPL	CollideRightCheck
+;	BMI	CollideLeftCheck
 
+CollideLeftCheck:
+;	LDA	delta_x
+	CLC
+	ADC	sprite_x
+	TAX
+
+	LDY	sprite_y
+
+	JSR	CheckCollision
+	BNE	.adjustLeft
+
+	LDA	sprite_y
+	CLC
+	ADC	#7
+	TAY
+
+	LDA	delta_x
+	ADC	sprite_x
+	TAX
+
+	JSR	CheckCollision
+	BEQ	CollideHorizNone
+
+.adjustLeft:
+	CLC
+	LDA	delta_x
+	ADC	sprite_x
+	CLC
+	ADC	#8
+	AND	#%11111000		; Align sprite on 8 pixels vertically
+					;    That works because the sprite height is a multiple of 8
+					;    Other heights need an adjustment
+	STA	sprite_x
+	JMP	MoveHorizDone
+
+CollideRightCheck:
 	; LDA	delta_x
 	CLC
 	ADC	sprite_x
@@ -635,41 +674,6 @@ CollideRightAdjust:
 	AND	#%11111000
 	SEC
 	SBC	#8
-	STA	sprite_x
-	JMP	MoveHorizDone
-
-CollideLeftCheck:
-;	LDA	delta_x
-	CLC
-	ADC	sprite_x
-	TAX
-
-	LDY	sprite_y
-
-	JSR	CheckCollision
-	BNE	CollideLeftAdjust
-
-	LDA	sprite_y
-	CLC
-	ADC	#7
-	TAY
-
-	LDA	delta_x
-	ADC	sprite_x
-	TAX
-
-	JSR	CheckCollision
-	BEQ	CollideHorizNone
-
-CollideLeftAdjust:
-	CLC
-	LDA	delta_x
-	ADC	sprite_x
-	CLC
-	ADC	#8
-	AND	#%11111000		; Align sprite on 8 pixels vertically
-					;    That works because the sprite height is a multiple of 8
-					;    Other heights need an adjustment
 	STA	sprite_x
 	JMP	MoveHorizDone
 
