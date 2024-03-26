@@ -579,20 +579,24 @@ ReadJoypad:
 ; **                          **
 ; ******************************
 
+; *** Set it to zero, so it's easier to increment/decrement ***
 	LDA	#0
 	STA	delta_x
 
 ; *** Process horizontal motion from joypad L/R ***
+InputHoriz:
 	LDA	joypad
 	AND	#%00000011	; L/R are in those 2 bits, mask the rest away
+.checkright:
 	CMP	#%00000001	; Check if R pressed but not L
-	BNE	InputRightDone
+	BNE	.checkleft
 	INC	delta_x
-InputRightDone:
+	JMP	.done
+.checkleft:
 	CMP	#%00000010	; Check if L pressed but not R
-	BNE	InputLeftDone
+	BNE	.done
 	DEC	delta_x
-InputLeftDone:
+.done:
 
 	LDA	delta_x
 	BEQ	MoveHorizDone
