@@ -594,97 +594,107 @@ InputHoriz:
 	CMP	#%00000010	; Check if L pressed but not R
 	BNE	.doneLeft
 	DEC	delta_x
-	JMP	.done
+	JMP	.doneAll
 .doneLeft:
 .checkRight:
 	CMP	#%00000001	; Check if R pressed but not L
 	BNE	.doneRight
 	INC	delta_x
 .doneRight:
-.done:
+.doneAll:
 
 CollideHoriz:
 	LDA	delta_x
-	BEQ	MoveHorizDone
-	BPL	CollideRightCheck
-;	BMI	CollideLeftCheck
-
-CollideLeftCheck:
-;	LDA	delta_x
+	BEQ	.done			; No horizontal motion, nothing to do
+	BPL	.rightCheck		; Moving to the right, check collisions on the right
+	;BMI	.leftCheck		; Moving to the left, check collisions on the left
+					; Skip: fall through
+.leftCheck:
+; *** Check collision of top-left corner ***
+	;LDA	delta_x			; Skip: A already contains delta_x
 	CLC
-	ADC	sprite_x
+	ADC	sprite_x		; Compute x of top-left corner after proposed motion
 	TAX
 
-	LDY	sprite_y
+	LDY	sprite_y		; y of top-left corner
 
 	JSR	CheckCollision
-	BNE	.adjustLeft
+	BNE	.leftMoveWithCollision	; There's a collision on the top left, adjust accordingly
 
+; *** Check collision of bottom-left corner ***
 	LDA	sprite_y
 	CLC
-	ADC	#7
+	ADC	#7			; Compute y of bottom-left corner
 	TAY
 
 	LDA	delta_x
-	ADC	sprite_x
+	;CLC				; Skip: carry is still clear from previous operation
+	ADC	sprite_x		; Compute x of bottom-left corner after proposed motion
 	TAX
 
 	JSR	CheckCollision
-	BEQ	CollideHorizNone
+	BEQ	.moveFree		; No collision, handle unrestricted motion
+	;BNE	.leftMoveWithCollision	; There's a collision on the bottom left, adjust accordingly
+					; Skip: fall through
 
-.adjustLeft:
-	CLC
-	LDA	delta_x
-	ADC	sprite_x
+.leftMoveWithCollision:
+	LDA	sprite_x
 	CLC
 	ADC	#8
-	AND	#%11111000		; Align sprite on 8 pixels vertically
-					;    That works because the sprite height is a multiple of 8
-					;    Other heights need an adjustment
+	;CLC				; Skip: no carry in the previous operation
+	ADC	delta_x
+	AND	#%11111000		; Align sprite on 8 pixels horizontally
 	STA	sprite_x
-	JMP	MoveHorizDone
+	JMP	.done
 
-CollideRightCheck:
-	; LDA	delta_x
+.rightCheck:
+	;LDA	delta_x			; Skip: A already contains delta_x
 	CLC
 	ADC	sprite_x
-	ADC	#7
+	;CLC				; Skip: no carry in the previous operation
+	ADC	#7			; Compute x of top-right corner after proposed motion
 	TAX
 
-	LDY	sprite_y
+	LDY	sprite_y		; y of top-right corner
+
 	JSR	CheckCollision
-	BNE	CollideRightAdjust
+	BNE	.rightMoveWithCollision	; There's a collision on the top-right, adjuste accordingly
+
+	LDA	delta_x
+	CLC
+	ADC	sprite_x
+	;CLC				; Skip: no carry in previous operation
+	ADC	#7			; Compute x of bottom-right corner after proposed motion
+	TAX
 
 	LDA	sprite_y
-	CLC
-	ADC	#7
+	;CLC				; Skip: no carry in previous operation
+	ADC	#7			; Compute y of bottom-right corner
 	TAY
 
-	LDA	delta_x
-	ADC	sprite_x
-	ADC	#7
-	TAX
-
 	JSR	CheckCollision
-	BEQ	CollideHorizNone
+	BEQ	.moveFree		; No collision on either corner, handle unrestricted motion
+	;BNE	.rightMoveWithCollision	; Skip: fall through
 
-CollideRightAdjust:
-	CLC
-	LDA	delta_x
-	ADC	sprite_x
-	ADC	#7
-	AND	#%11111000
-	SEC
-	SBC	#8
-	STA	sprite_x
-	JMP	MoveHorizDone
-
-CollideHorizNone:
+.rightMoveWithCollision:
 	LDA	delta_x
 	CLC
 	ADC	sprite_x
+	;CLC				; Skip: no carry in previous operation
+	ADC	#7			; Compute x of proposed right edge that causes a collision
+	AND	#%11111000		; Align on 8 pixels, i.e. the first pixel that would cause a collision
+	;CLC				; Skip: no carry in previous operation, i.e. borrow set
+	SBC	#7			; Subtract 8 (7 + borrow) to compute where the left edge of the sprite can
+					;	be without causing a collision
 	STA	sprite_x
-MoveHorizDone:
+	JMP	.done
+
+.moveFree:
+	LDA	delta_x
+	CLC
+	ADC	sprite_x
+	STA	sprite_x
+.done:
 
 ; ****************************
 ; **                        **
