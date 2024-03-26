@@ -770,34 +770,32 @@ JustLeftPlatform:
 ; *** Just left platform, start to fall ***
 	LDA	#20
 	STA	jump_state
-	JMP	PhysicsDone
+	JMP	DoJumpCurve
 
 StillOnPlatform:
 ; Still on the platform, check joypad ***
 	LDA	joypad
 	AND	#%00001000
-	BEQ	PhysicsDone
+	BEQ	DoJumpCurve
 	INC	jump_state
-	JMP	PhysicsDone
+	JMP	DoJumpCurve
 
 StartInAir:
+; Still in the air, advance jump if we're not already at the end ***
 	LDA	#20
 	CMP	jump_state
-	BEQ	Falling
+	BEQ	DoJumpCurve
 	INC	jump_state
-	JMP	PhysicsDone
+;	JMP	DoJumpCurve		; Skip: fall through
 
-Falling:
-	JMP	PhysicsDone
-
-PhysicsDone:
+DoJumpCurve:
 	LDA	jump_state
 	BEQ	JumpDone
 	CMP	#20
-	BEQ	AirDown
+	BEQ	InAirGoingDown
 	DEC	delta_y
 	JMP	JumpDone
-AirDown:
+InAirGoingDown:
 	INC	delta_y
 	JMP	JumpDone
 
