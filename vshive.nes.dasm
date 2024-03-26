@@ -588,17 +588,18 @@ ReadJoypad:
 InputHoriz:
 	LDA	joypad
 	AND	#%00000011	; L/R are in those 2 bits, mask the rest away
-.checkRight:
-	CMP	#%00000001	; Check if R pressed but not L
-	BNE	.checkleft
-	INC	delta_x
-	JMP	.done
 .checkLeft:
 	CMP	#%00000010	; Check if L pressed but not R
-	BNE	.done
+	BNE	.checkRight
 	DEC	delta_x
+	JMP	.done
+.checkRight:
+	CMP	#%00000001	; Check if R pressed but not L
+	BNE	.done
+	INC	delta_x
 .done:
 
+CollideHoriz:
 	LDA	delta_x
 	BEQ	MoveHorizDone
 	BMI	CollideLeftCheck
@@ -676,15 +677,6 @@ CollideHorizNone:
 	LDA	delta_x
 	CLC
 	ADC	sprite_x
-
-;	CMP	#32
-;	BCS	MoveLeftOK
-;	LDA	#32
-;MoveLeftOK:
-;	CMP	#224
-;	BCC	MoverightOK
-;	LDA	#224
-;MoverightOK:
 	STA	sprite_x
 MoveHorizDone:
 
