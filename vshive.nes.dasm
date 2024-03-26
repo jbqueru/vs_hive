@@ -28,7 +28,8 @@
 ;	- Standalone block comments in the first 80 columns
 ;	- Code-related block comments allowed in the last 80 columns
 ;	- Rulers at 40, 80 and 120 columns help source width
-;	- Symbols for code are CamelCase
+;	- Global symbols for code are CamelCase
+;	- Local symbols for code are lowerCamelCase
 ;	- Symbols for variables are snake_case
 ;	- Symbols for hardware registers are ALL_CAPS
 ;	- Related symbols start with the same prefix (so they sort together)
@@ -587,12 +588,12 @@ ReadJoypad:
 InputHoriz:
 	LDA	joypad
 	AND	#%00000011	; L/R are in those 2 bits, mask the rest away
-.checkright:
+.checkRight:
 	CMP	#%00000001	; Check if R pressed but not L
 	BNE	.checkleft
 	INC	delta_x
 	JMP	.done
-.checkleft:
+.checkLeft:
 	CMP	#%00000010	; Check if L pressed but not R
 	BNE	.done
 	DEC	delta_x
@@ -981,10 +982,10 @@ CheckCollision:
 	TAX
 	SEC			; set the bit to shift
 	LDA	#0
-.Shift:
+.shift:
 	ROR			; non-standard bit numbering, 0 is MSB
 	DEX
-	BPL	.Shift
+	BPL	.shift
 
 	AND	Level0,Y	; check the one bit we care about
 
