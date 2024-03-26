@@ -192,8 +192,13 @@ joypad:		ds.b	1		; abspudlr
 					; ||+------ select
 					; |+------- button B
 					; +-------- button A
+
+jump_state:	ds.b	1	; position in the jump curve
+				; 0 = not jumping
+
 delta_x:	ds.b	1
 delta_y:	ds.b	1
+
 coll_addr:	ds.b	1
 
 	seg.u	stack
@@ -567,43 +572,15 @@ ReadJoypad:
 ; ###################
 ; ###################
 
-; *** Default motion is not to move ***
+
+; ******************************
+; **                          **
+; ** Handle horizontal motion **
+; **                          **
+; ******************************
+
 	LDA	#0
 	STA	delta_x
-	STA	delta_y
-
-; ********************
-; **                **
-; ** Handle physics **
-; **                **
-; ********************
-
-	LDX	sprite_x
-	LDA	sprite_y
-	CLC
-	ADC	#8
-	TAY
-	JSR	CheckCollision
-	BNE	OnPlatform
-
-	LDA	sprite_x
-	CLC
-	ADC	#7
-	TAX
-	LDA	sprite_y
-	ADC	#8
-	TAY
-	JSR	CheckCollision
-	BNE	OnPlatform
-
-	INC	delta_y
-OnPlatform:
-
-; ********************************
-; **                            **
-; ** Process inputs into motion **
-; **                            **
-; ********************************
 
 ; *** Process horizontal motion from joypad L/R ***
 	LDA	joypad
@@ -616,25 +593,6 @@ InputRightDone:
 	BNE	InputLeftDone
 	DEC	delta_x
 InputLeftDone:
-
-; *** Process vertical motion from joypad U/D ***
-	LDA	joypad
-	AND	#%00001100	; U/D are in those 2 bits, mask the rest away
-	CMP	#%00000100	; Check if D pressed but not U
-	BNE	InputDownDone
-;	INC	delta_y
-InputDownDone:
-	CMP	#%00001000	; Check if U pressed but not D
-	BNE	InputUpDone
-	DEC	delta_y
-	DEC	delta_y
-InputUpDone:
-
-; ***************************************
-; **                                   **
-; ** Move player with collision checks **
-; **                                   **
-; ***************************************
 
 	LDA	delta_x
 	BEQ	MoveHorizDone
@@ -725,6 +683,87 @@ CollideHorizNone:
 	STA	sprite_x
 MoveHorizDone:
 
+; ****************************
+; **                        **
+; ** Handle vertical motion **
+; **                        **
+; ****************************
+
+
+; state: on platform vs in-air (could be jumping or falling)
+;	sub-state: jump curve
+; state: button on previous frame
+
+
+; if previously on platform (jump state = 0)
+;   if still on platform
+;     if button previously not pressed
+;     and if button now pressed
+;       start jump
+;   else (just left platform without jumping)
+;     start jump mid-curve
+; else (previously in air)
+;   process jump curve
+;   if fall onto platform
+;     end jump
+
+
+; *** Default motion is not to move ***
+	LDA	#0
+	STA	delta_y
+
+; *** Process desired vertical motion ***
+	LDA	#0
+	CMP	jump_state	; 0 = still on platform
+	BNE	InAir
+
+; *** Was on platform in previous frame, check if still on platform ***
+	LDX	sprite_x
+	LDA	sprite_y
+	CLC
+	ADC	#8
+	TAY
+	JSR	CheckCollision
+	BNE	OnPlatform
+
+	LDA	sprite_x
+	CLC
+	ADC	#7
+	TAX
+	LDA	sprite_y
+	ADC	#8
+	TAY
+	JSR	CheckCollision
+	BNE	OnPlatform
+
+; *** Just left platform, start to fall ***
+	LDA	#20
+	STA	jump_state
+	INC	delta_y
+	JMP	PhysicsDone
+
+; Still on the platform ***
+OnPlatform:
+	LDA	joypad
+	AND	#%00001000
+	BEQ	PhysicsDone
+	INC	jump_state
+	JMP	PhysicsDone
+
+InAir:
+	LDA	#20
+	CMP	jump_state
+	BEQ	Falling
+	DEC	delta_y
+	INC	jump_state
+	JMP	PhysicsDone
+
+Falling:
+	INC	delta_y
+	JMP	PhysicsDone
+
+PhysicsDone:
+
 	LDA	delta_y
 	BEQ	MoveVertDone		; No vertical motion, no need to check for vertical collisions
 	BMI	CollideUpCheck		; Moving up, no need to check for bottom collisions
@@ -765,6 +804,8 @@ CollideDownAdjust:
 					;    That works because the sprite height is a multiple of 8
 					;    Other heights need an adjustment
 	STA	sprite_y
+	LDA	#0
+	STA	jump_state
 	JMP	MoveVertDone
 
 CollideUpCheck:
