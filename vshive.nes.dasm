@@ -779,7 +779,7 @@ JustLeftPlatform:
 StillOnPlatform:
 ; Still on the platform, check joypad ***
 	LDA	joypad
-	AND	#%00001000
+	AND	#%10000000
 	BEQ	DoJumpCurve
 	INC	jump_state
 	JMP	DoJumpCurve
