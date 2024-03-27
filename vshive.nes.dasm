@@ -748,10 +748,12 @@ CollideHoriz:
 StartOnPlatform
 ; *** Was on platform in previous frame, check if still on platform ***
 	LDX	sprite_x		; X position below bottom-left
+
 	LDA	sprite_y
 	CLC
 	ADC	#8			; Compute Y position below bottom-left
 	TAY
+
 	JSR	CheckCollision
 	BNE	StillOnPlatform		; There's somethin below bottom-left, we're still on a platform
 
@@ -759,10 +761,12 @@ StartOnPlatform
 	CLC
 	ADC	#7			; Compute X position below bottom-right
 	TAX
+
 	LDA	sprite_y
 	;CLC				; Skip: carry still clear from previous operation
 	ADC	#8			; Compute Y position below bottom-right
 	TAY
+
 	JSR	CheckCollision
 	BNE	StillOnPlatform		; There's something below bottom-right, we're still on a platform
 
