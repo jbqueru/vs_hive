@@ -199,6 +199,9 @@ joypad:		ds.b	1		; abspudlr
 jump_state:	ds.b	1	; position in the jump curve
 				; 0 = not jumping
 
+kept_pressed	ds.b	1	; button still pressed from last jump
+				; 0 = button was released
+
 delta_x:	ds.b	1
 delta_y:	ds.b	1
 
@@ -778,10 +781,12 @@ JustLeftPlatform:
 
 StillOnPlatform:
 ; Still on the platform, check joypad ***
-	LDA	joypad
-	AND	#%10000000
-	BEQ	DoJumpCurve
+	LDA	kept_pressed
+	BNE	DoJumpCurve
+	BIT	joypad
+	BPL	DoJumpCurve
 	INC	jump_state
+	INC	kept_pressed
 	JMP	DoJumpCurve
 
 StartInAir:
@@ -899,6 +904,12 @@ CollideVertNone:
 ;MoveBottomOK:
 	STA	sprite_y
 MoveVertDone:
+
+	BIT	joypad
+	BMI	StillPressed
+	LDA	#0
+	STA	kept_pressed
+StillPressed:
 
 ; ###############################
 ; ###############################
